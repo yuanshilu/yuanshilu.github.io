@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分享原文、原文件 - 远视鹿</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+        .container {
+            text-align: center;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+        }
+        .main-text {
+            font-size: 24px;
+            writing-mode: vertical-rl;
+            text-orientation: upright;
+            margin-right: 20px;
+        }
+        .signature {
+            font-size: 18px;
+            writing-mode: vertical-rl;
+            text-orientation: upright;
+            position: relative;
+        }
+        #deer {
+            transition: all 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-text">分享原文、原文件</div>
+        <div class="signature">远视<span id="deer">鹿</span></div>
+    </div>
+
+    <script>
+        const deer = document.getElementById('deer');
+        let isText = true;
+
+        function toggleDeer() {
+            if (isText) {
+                deer.textContent = '🦌';
+            } else {
+                deer.textContent = '鹿';
+            }
+            isText = !isText;
+            setTimeout(toggleDeer, Math.random() * 3000 + 2000); // 随机 2-5 秒之间切换
+        }
+
+        toggleDeer();
+    </script>
+</body>
+</html>
