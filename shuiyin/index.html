@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>批量图片水印 · 多图处理</title>
+  <!-- JSZip 用于打包下载 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #f4f6fa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .card {
+      max-width: 1400px;
+      width: 100%;
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-radius: 32px;
+      box-shadow: 0 20px 35px rgba(0,0,0,0.1);
+      padding: 28px 30px 35px;
+      border: 1px solid rgba(255,255,255,0.5);
+    }
+    h1 {
+      margin: 0 0 5px 0;
+      font-weight: 600;
+      font-size: 2rem;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+    }
+    .subtitle {
+      color: #475569;
+      margin-bottom: 25px;
+      font-size: 1rem;
+      border-left: 4px solid #3b82f6;
+      padding-left: 18px;
+    }
+    .workspace {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 28px;
+    }
+    /* 左侧控制面板 */
+    .control-panel {
+      flex: 1.1;
+      min-width: 320px;
+      background: rgba(255,255,255,0.6);
+      border-radius: 28px;
+      padding: 24px 22px;
+      backdrop-filter: blur(4px);
+      box-shadow: inset 0 1px 4px rgba(255,255,255,0.8);
+      border: 1px solid #e9eef3;
+    }
+    /* 右侧区域 (预览+图片处理) */
+    .right-area {
+      flex: 2.2;
+      min-width: 600px;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    }
+    .preview-card {
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 16px;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.05);
+      border: 1px solid #dce3ec;
+    }
+    .section-title {
+      font-weight: 600;
+      margin: 0 0 12px 0;
+      color: #0b1e32;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.2rem;
+    }
+    .canvas-wrapper {
+      display: flex;
+      justify-content: center;
+      background: #fafcff;
+      border-radius: 16px;
+      padding: 8px;
+    }
+    canvas {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      border-radius: 12px;
+      background: #ffffff;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.03);
+    }
+    .batch-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+    .upload-btn {
+      background: #1e293b;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 40px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+      transition: 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1rem;
+    }
+    .upload-btn:hover {
+      background: #0f172a;
+      transform: translateY(-1px);
+    }
+    .batch-actions {
+      display: flex;
+      gap: 12px;
+    }
+    .btn {
+      background: white;
+      border: 1px solid #cbd5e1;
+      padding: 10px 22px;
+      border-radius: 40px;
+      font-weight: 500;
+      color: #1e293b;
+      cursor: pointer;
+      transition: all 0.15s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+      font-size: 0.95rem;
+    }
+    .btn-primary {
+      background: #2563eb;
+      border-color: #2563eb;
+      color: white;
+      box-shadow: 0 6px 12px rgba(37,99,235,0.2);
+    }
+    .btn-primary:hover {
+      background: #1d4ed8;
+    }
+    .btn-outline-blue {
+      border-color: #93c5fd;
+      background: #eff6ff;
+    }
+    .image-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 18px;
+      margin-top: 15px;
+    }
+    .image-item {
+      background: white;
+      border-radius: 18px;
+      padding: 12px 12px 14px;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.04);
+      border: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+    }
+    .thumb-wrapper {
+      aspect-ratio: 1 / 1;
+      background: #f1f5f9;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border: 1px solid #dee6ed;
+    }
+    .thumb-wrapper img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+    .item-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      gap: 6px;
+    }
+    .item-actions button {
+      flex: 1;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 30px;
+      padding: 6px 0;
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: 0.1s;
+    }
+    .item-actions button:hover {
+      background: #e2e8f0;
+    }
+    .progress-tip {
+      font-size: 0.85rem;
+      color: #64748b;
+      margin-left: 12px;
+    }
+    /* 控制组样式继承 */
+    .control-group {
+      margin-bottom: 24px;
+      border-bottom: 1px dashed #cbd5e1;
+      padding-bottom: 18px;
+    }
+    .control-group h3 {
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin: 0 0 16px 0;
+      color: #0f172a;
+    }
+    .input-row {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 18px;
+    }
+    .input-row label {
+      font-weight: 500;
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+      color: #334155;
+    }
+    .input-row input[type="text"] {
+      padding: 10px 14px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 20px;
+      font-size: 1rem;
+      background: white;
+      outline: none;
+    }
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #f8fafc;
+      padding: 6px 14px;
+      border-radius: 30px;
+      border: 1px solid #dee6ed;
+    }
+    .slider-block {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .slider-block input[type="range"] {
+      flex: 1;
+      height: 6px;
+      border-radius: 10px;
+      background: #e2e8f0;
+    }
+    .value-badge {
+      min-width: 55px;
+      text-align: right;
+      font-weight: 600;
+      background: #eef2ff;
+      padding: 4px 10px;
+      border-radius: 30px;
+    }
+    .color-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    input[type="color"] {
+      width: 48px;
+      height: 38px;
+      border: 2px solid white;
+      border-radius: 16px;
+      background: white;
+    }
+    input[type="color"]:disabled {
+      opacity: 0.5;
+    }
+    .random-badge {
+      background: #fef3c7;
+      border-color: #fbbf24;
+    }
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 10px;
+    }
+    .footer-note {
+      margin-top: 12px;
+      font-size: 0.8rem;
+      color: #62748c;
+    }
+  </style>
+</head>
+<body>
+<div class="card">
+  <h1>🖼️ 图片水印批量处理</h1>
+  <div class="subtitle">自定义水印 · 多图上传 · 单张/打包下载</div>
+
+  <div class="workspace">
+    <!-- 左侧：水印参数控制 (与之前类似，但默认文字修改) -->
+    <div class="control-panel">
+      <div class="control-group">
+        <h3>📝 水印文字</h3>
+        <div class="input-row">
+          <label>文字内容</label>
+          <input type="text" id="watermarkText" value="用于临时认证" placeholder="输入水印文字" maxlength="40">
+        </div>
+        <div class="checkbox-row">
+          <div class="checkbox-item">
+            <input type="checkbox" id="includeDateCheckbox" checked> 
+            <label for="includeDateCheckbox">📅 添加当前日期</label>
+          </div>
+          <div style="font-size:0.9rem;" id="datePreview">2026-04-13</div>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <h3>🎨 色彩 & 特效</h3>
+        <div class="color-row">
+          <div class="color-picker-wrap" style="display:flex; align-items:center; gap:8px; background:#f1f5f9; padding:4px 14px; border-radius:40px;">
+            <input type="color" id="baseColorPicker" value="#2c3e50">
+            <label>基础颜色</label>
+          </div>
+          <div class="checkbox-item random-badge">
+            <input type="checkbox" id="randomColorMode"> 
+            <label for="randomColorMode">🌈 随机颜色 (每字不同色)</label>
+          </div>
+        </div>
+
+        <div class="input-row">
+          <label>💧 透明度 <span id="opacityValue">0.35</span></label>
+          <div class="slider-block">
+            <input type="range" id="opacitySlider" min="0.05" max="1.0" step="0.01" value="0.35">
+            <span class="value-badge" id="opacityDisplay">0.35</span>
+          </div>
+        </div>
+
+        <div class="input-row">
+          <label>🔄 倾斜角度 <span id="angleValue">-25°</span></label>
+          <div class="slider-block">
+            <input type="range" id="angleSlider" min="-80" max="80" value="-25" step="1">
+            <span class="value-badge" id="angleDisplay">-25°</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <h3>📏 布局 & 密度</h3>
+        <div class="input-row">
+          <label>↔️ 水平间距 (px) <span id="hSpacingValue">140</span></label>
+          <div class="slider-block">
+            <input type="range" id="hSpacingSlider" min="60" max="300" value="140" step="5">
+            <span class="value-badge" id="hSpacingDisplay">140</span>
+          </div>
+        </div>
+        <div class="input-row">
+          <label>↕️ 垂直间距 (px) <span id="vSpacingValue">110</span></label>
+          <div class="slider-block">
+            <input type="range" id="vSpacingSlider" min="50" max="280" value="110" step="5">
+            <span class="value-badge" id="vSpacingDisplay">110</span>
+          </div>
+        </div>
+        <div class="input-row">
+          <label>🔤 字体大小 (px) <span id="fontSizeValue">28</span></label>
+          <div class="slider-block">
+            <input type="range" id="fontSizeSlider" min="16" max="64" value="28" step="1">
+            <span class="value-badge" id="fontSizeDisplay">28</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn" id="resetDefaultsBtn">↻ 重置</button>
+        <button class="btn btn-primary" id="applyStylePreviewBtn">🔄 刷新样式预览</button>
+      </div>
+      <div class="footer-note">
+        ⚡ 随机颜色时每字符独立取色 · 参数对全部图片生效
+      </div>
+    </div>
+
+    <!-- 右侧：预览画布 + 图片批量区 -->
+    <div class="right-area">
+      <!-- 水印样式预览画布 (用于快速查看平铺效果) -->
+      <div class="preview-card">
+        <div class="section-title">🔍 水印样式预览 (平铺效果)</div>
+        <div class="canvas-wrapper">
+          <canvas id="watermarkCanvas" width="640" height="360"></canvas>
+        </div>
+        <div style="margin-top:8px; font-size:0.85rem; color:#475569;" id="liveTextHint">当前文字: 用于临时认证 2026-04-13</div>
+      </div>
+
+      <!-- 图片上传与批量处理 -->
+      <div class="preview-card">
+        <div class="section-title">📁 图片批量处理</div>
+        <div class="batch-toolbar">
+          <label class="upload-btn">
+            📤 选择图片 (可多选)
+            <input type="file" id="imageUploadInput" accept="image/*" multiple style="display:none;">
+          </label>
+          <div class="batch-actions">
+            <button class="btn btn-outline-blue" id="applyWatermarkToAllBtn">🎨 应用水印到全部</button>
+            <button class="btn btn-primary" id="downloadAllAsZipBtn">⬇ 打包下载 (ZIP)</button>
+          </div>
+          <span class="progress-tip" id="batchStatusTip"></span>
+        </div>
+        
+        <!-- 图片列表展示区 -->
+        <div id="imageListContainer" class="image-list">
+          <div style="grid-column:1/-1; text-align:center; color:#94a3b8; padding:30px;">
+            点击上方按钮上传图片，支持多选
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    "use strict";
+
+    // ---------- DOM 元素 ----------
+    const canvas = document.getElementById('watermarkCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    // 水印控制
+    const textInput = document.getElementById('watermarkText');
+    const includeDateCheck = document.getElementById('includeDateCheckbox');
+    const datePreviewSpan = document.getElementById('datePreview');
+    const baseColorPicker = document.getElementById('baseColorPicker');
+    const randomColorMode = document.getElementById('randomColorMode');
+    
+    const opacitySlider = document.getElementById('opacitySlider');
+    const opacityDisplay = document.getElementById('opacityDisplay');
+    const opacityValueSpan = document.getElementById('opacityValue');
+    const angleSlider = document.getElementById('angleSlider');
+    const angleDisplay = document.getElementById('angleDisplay');
+    const angleValueSpan = document.getElementById('angleValue');
+    
+    const hSpacingSlider = document.getElementById('hSpacingSlider');
+    const hSpacingDisplay = document.getElementById('hSpacingDisplay');
+    const hSpacingValueSpan = document.getElementById('hSpacingValue');
+    const vSpacingSlider = document.getElementById('vSpacingSlider');
+    const vSpacingDisplay = document.getElementById('vSpacingDisplay');
+    const vSpacingValueSpan = document.getElementById('vSpacingValue');
+    const fontSizeSlider = document.getElementById('fontSizeSlider');
+    const fontSizeDisplay = document.getElementById('fontSizeDisplay');
+    const fontSizeValueSpan = document.getElementById('fontSizeValue');
+    
+    const liveTextHint = document.getElementById('liveTextHint');
+    
+    // 按钮
+    const resetDefaultsBtn = document.getElementById('resetDefaultsBtn');
+    const applyStylePreviewBtn = document.getElementById('applyStylePreviewBtn');
+    
+    // 图片批量相关
+    const imageUploadInput = document.getElementById('imageUploadInput');
+    const applyWatermarkBtn = document.getElementById('applyWatermarkToAllBtn');
+    const downloadZipBtn = document.getElementById('downloadAllAsZipBtn');
+    const imageListContainer = document.getElementById('imageListContainer');
+    const batchStatusTip = document.getElementById('batchStatusTip');
+    
+    // ---------- 状态 ----------
+    let originalImages = [];            // 存储原始图片对象 { id, file, imgElement, name }
+    let processedCanvases = new Map();  // id -> dataURL (带水印的图片)
+    let nextId = 0;
+    
+    // ---------- 辅助函数: 日期 ----------
+    function getCurrentDateString() {
+      const d = new Date();
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+    function updateDatePreview() {
+      datePreviewSpan.textContent = getCurrentDateString();
+    }
+    
+    // 获取最终水印文字
+    function getFinalWatermarkText() {
+      let base = textInput.value.trim();
+      if (base === '') base = '水印';
+      if (includeDateCheck.checked) {
+        return `${base} ${getCurrentDateString()}`;
+      }
+      return base;
+    }
+    
+    // 随机颜色
+    function getRandomCharColor() {
+      const hue = Math.floor(Math.random() * 360);
+      const sat = 60 + Math.floor(Math.random() * 25);
+      const light = 55 + Math.floor(Math.random() * 20);
+      return `hsl(${hue}, ${sat}%, ${light}%)`;
+    }
+    
+    // ---------- 核心绘制函数: 在给定canvas上下文绘制水印 (平铺) ----------
+    function drawWatermarkOnContext(context, width, height) {
+      const finalText = getFinalWatermarkText();
+      if (finalText.length === 0) return;
+      
+      const useRandom = randomColorMode.checked;
+      const baseColor = baseColorPicker.value;
+      const opacity = parseFloat(opacitySlider.value);
+      const angleDeg = parseFloat(angleSlider.value);
+      const hSpacing = parseFloat(hSpacingSlider.value);
+      const vSpacing = parseFloat(vSpacingSlider.value);
+      const fontSize = parseFloat(fontSizeSlider.value);
+      
+      context.save();
+      context.globalAlpha = opacity;
+      context.font = `${fontSize}px 'Segoe UI', 'Roboto', system-ui, sans-serif`;
+      context.textAlign = 'center';
+      context.textBaseline = 'middle';
+      
+      const chars = finalText.split('');
+      // 测量字符宽度
+      const charWidths = chars.map(ch => context.measureText(ch).width);
+      const totalWidth = charWidths.reduce((s, w) => s + w, 0);
+      const angleRad = angleDeg * Math.PI / 180;
+      
+      const startX = -hSpacing;
+      const startY = -vSpacing;
+      const endX = width + hSpacing;
+      const endY = height + vSpacing;
+      
+      for (let y = startY; y < endY; y += vSpacing) {
+        for (let x = startX; x < endX; x += hSpacing) {
+          context.save();
+          context.translate(x, y);
+          context.rotate(angleRad);
+          
+          let currentX = -totalWidth / 2;
+          for (let i = 0; i < chars.length; i++) {
+            const char = chars[i];
+            const charWidth = charWidths[i];
+            if (useRandom) {
+              context.fillStyle = getRandomCharColor();
+            } else {
+              context.fillStyle = baseColor;
+            }
+            const charCenterX = currentX + charWidth / 2;
+            context.fillText(char, charCenterX, 0);
+            currentX += charWidth;
+          }
+          context.restore();
+        }
+      }
+      context.restore();
+    }
+    
+    // 刷新预览画布 (白色背景)
+    function refreshPreviewCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      drawWatermarkOnContext(ctx, canvas.width, canvas.height);
+      
+      // 更新提示文字
+      liveTextHint.textContent = `当前文字: ${getFinalWatermarkText()}`;
+      baseColorPicker.disabled = randomColorMode.checked;
+    }
+    
+    // 更新滑块显示
+    function updateSliderDisplays() {
+      opacityDisplay.textContent = opacitySlider.value;
+      opacityValueSpan.textContent = opacitySlider.value;
+      angleDisplay.textContent = angleSlider.value + '°';
+      angleValueSpan.textContent = angleSlider.value + '°';
+      hSpacingDisplay.textContent = hSpacingSlider.value;
+      hSpacingValueSpan.textContent = hSpacingSlider.value;
+      vSpacingDisplay.textContent = vSpacingSlider.value;
+      vSpacingValueSpan.textContent = vSpacingSlider.value;
+      fontSizeDisplay.textContent = fontSizeSlider.value;
+      fontSizeValueSpan.textContent = fontSizeSlider.value;
+    }
+    
+    // ---------- 图片处理: 给单张图片加水印，返回canvas (保持原尺寸) ----------
+    function applyWatermarkToImage(img) {
+      // 创建离屏canvas，尺寸与图片一致
+      const imgWidth = img.naturalWidth || img.width;
+      const imgHeight = img.naturalHeight || img.height;
+      const offCanvas = document.createElement('canvas');
+      offCanvas.width = imgWidth;
+      offCanvas.height = imgHeight;
+      const offCtx = offCanvas.getContext('2d');
+      
+      // 绘制原图
+      offCtx.drawImage(img, 0, 0, imgWidth, imgHeight);
+      // 绘制水印 (平铺)
+      drawWatermarkOnContext(offCtx, imgWidth, imgHeight);
+      
+      return offCanvas;
+    }
+    
+    // 处理所有原始图片，生成带水印的dataURL并更新UI
+    async function processAllImages() {
+      if (originalImages.length === 0) {
+        batchStatusTip.textContent = '没有图片，请先上传';
+        return;
+      }
+      batchStatusTip.textContent = '处理中...';
+      
+      // 清空之前的处理结果
+      processedCanvases.clear();
+      
+      // 为避免阻塞UI，使用setTimeout分批，但图片数量不多时直接处理
+      for (let item of originalImages) {
+        const img = item.imgElement;
+        if (!img.complete) {
+          // 等待图片加载
+          await new Promise(resolve => { img.onload = resolve; });
+        }
+        const resultCanvas = applyWatermarkToImage(img);
+        const dataURL = resultCanvas.toDataURL('image/png');
+        processedCanvases.set(item.id, dataURL);
+      }
+      
+      // 重新渲染图片列表 (展示带水印的缩略图)
+      renderImageList();
+      batchStatusTip.textContent = `✅ 已处理 ${originalImages.length} 张图片`;
+    }
+    
+    // 渲染图片列表 (使用处理后的图片，若未处理则展示原图)
+    function renderImageList() {
+      if (originalImages.length === 0) {
+        imageListContainer.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:#94a3b8; padding:30px;">点击上方按钮上传图片，支持多选</div>`;
+        return;
+      }
+      
+      let html = '';
+      for (let item of originalImages) {
+        const hasProcessed = processedCanvases.has(item.id);
+        const imgSrc = hasProcessed ? processedCanvases.get(item.id) : item.imgElement.src;
+        const fileName = item.name || 'image';
+        
+        html += `
+          <div class="image-item" data-id="${item.id}">
+            <div class="thumb-wrapper">
+              <img src="${imgSrc}" alt="thumb" />
+            </div>
+            <div class="item-actions">
+              <button class="download-single-btn" data-id="${item.id}">⬇ 下载</button>
+              <button class="remove-img-btn" data-id="${item.id}">✕ 移除</button>
+            </div>
+            <div style="font-size:0.7rem; margin-top:6px; text-align:center; color:#62748c; overflow:hidden; text-overflow:ellipsis;">${fileName}</div>
+          </div>
+        `;
+      }
+      imageListContainer.innerHTML = html;
+      
+      // 绑定单张下载事件
+      document.querySelectorAll('.download-single-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const id = Number(btn.dataset.id);
+          downloadSingleImage(id);
+        });
+      });
+      // 绑定移除事件
+      document.querySelectorAll('.remove-img-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const id = Number(btn.dataset.id);
+          removeImageById(id);
+        });
+      });
+    }
+    
+    // 下载单张 (优先下载带水印的)
+    function downloadSingleImage(id) {
+      const item = originalImages.find(img => img.id === id);
+      if (!item) return;
+      
+      let dataUrl;
+      if (processedCanvases.has(id)) {
+        dataUrl = processedCanvases.get(id);
+      } else {
+        // 如果没有处理过，现场处理一下 (保证有水印)
+        const canvas = applyWatermarkToImage(item.imgElement);
+        dataUrl = canvas.toDataURL('image/png');
+        processedCanvases.set(id, dataUrl);
+      }
+      
+      const link = document.createElement('a');
+      link.download = `watermarked_${item.name || 'image'}.png`;
+      link.href = dataUrl;
+      link.click();
+    }
+    
+    function removeImageById(id) {
+      originalImages = originalImages.filter(img => img.id !== id);
+      processedCanvases.delete(id);
+      renderImageList();
+      batchStatusTip.textContent = originalImages.length ? `${originalImages.length} 张图片` : '';
+    }
+    
+    // 打包下载所有已处理图片 (ZIP)
+    async function downloadAllAsZip() {
+      if (originalImages.length === 0) {
+        alert('没有图片可打包');
+        return;
+      }
+      
+      // 确保全部已处理
+      if (processedCanvases.size !== originalImages.length) {
+        batchStatusTip.textContent = '正在生成水印...';
+        await processAllImages();
+      }
+      
+      const zip = new JSZip();
+      let count = 0;
+      for (let item of originalImages) {
+        const dataUrl = processedCanvases.get(item.id);
+        if (dataUrl) {
+          // 将base64转为blob
+          const base64Data = dataUrl.split(',')[1];
+          const fileName = `watermark_${item.name || 'img'}.png`;
+          zip.file(fileName, base64Data, { base64: true });
+          count++;
+        }
+      }
+      
+      if (count === 0) {
+        alert('没有可下载的图片');
+        return;
+      }
+      
+      const content = await zip.generateAsync({ type: 'blob' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(content);
+      link.download = `watermarked_batch_${Date.now()}.zip`;
+      link.click();
+      batchStatusTip.textContent = `✅ 打包 ${count} 张图片完成`;
+    }
+    
+    // ---------- 上传处理 ----------
+    function handleFiles(files) {
+      if (!files.length) return;
+      
+      // 清空旧数据？可以选择追加或替换，这里采用追加
+      // 但为了避免混乱，我们追加。
+      for (let file of files) {
+        if (!file.type.startsWith('image/')) continue;
+        
+        const id = nextId++;
+        const img = new Image();
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          img.src = e.target.result;
+          img.onload = () => {
+            // 加载完成后渲染列表 (但此时可能还没处理)
+            renderImageList();
+          };
+        };
+        reader.readAsDataURL(file);
+        
+        originalImages.push({
+          id,
+          file,
+          imgElement: img,
+          name: file.name || '未命名'
+        });
+      }
+      
+      // 清空已处理缓存 (因为新图片没有水印)
+      processedCanvases.clear();
+      renderImageList();
+      batchStatusTip.textContent = `已添加 ${files.length} 张，共 ${originalImages.length} 张`;
+      
+      // 清空input以便再次选择相同文件
+      imageUploadInput.value = '';
+    }
+    
+    // ---------- 初始化事件绑定 ----------
+    function bindEvents() {
+      // 水印参数变化 -> 刷新预览画布
+      const inputs = [textInput, includeDateCheck, baseColorPicker, randomColorMode, 
+                      opacitySlider, angleSlider, hSpacingSlider, vSpacingSlider, fontSizeSlider];
+      inputs.forEach(el => el.addEventListener('input', () => {
+        updateSliderDisplays();
+        refreshPreviewCanvas();
+        updateDatePreview();
+      }));
+      
+      // 重置默认 (默认文字改为“用于临时认证”)
+      resetDefaultsBtn.addEventListener('click', () => {
+        textInput.value = '用于临时认证';
+        includeDateCheck.checked = true;
+        baseColorPicker.value = '#2c3e50';
+        randomColorMode.checked = false;
+        opacitySlider.value = '0.35';
+        angleSlider.value = '-25';
+        hSpacingSlider.value = '140';
+        vSpacingSlider.value = '110';
+        fontSizeSlider.value = '28';
+        updateSliderDisplays();
+        refreshPreviewCanvas();
+        updateDatePreview();
+      });
+      
+      applyStylePreviewBtn.addEventListener('click', () => {
+        refreshPreviewCanvas();
+      });
+      
+      // 上传图片
+      imageUploadInput.addEventListener('change', (e) => {
+        handleFiles(e.target.files);
+      });
+      // 点击upload-btn触发input
+      document.querySelector('.upload-btn').addEventListener('click', () => {
+        imageUploadInput.click();
+      });
+      
+      // 应用水印到全部
+      applyWatermarkBtn.addEventListener('click', () => {
+        processAllImages();
+      });
+      
+      // 打包下载
+      downloadZipBtn.addEventListener('click', () => {
+        downloadAllAsZip();
+      });
+    }
+    
+    // 初次同步显示
+    function initialSync() {
+      updateSliderDisplays();
+      updateDatePreview();
+      refreshPreviewCanvas();
+    }
+    
+    // 启动
+    initialSync();
+    bindEvents();
+    
+    // 暴露一些方法 (调试)
+    window._debug = { originalImages, processedCanvases };
+  })();
+</script>
+</body>
+</html>
