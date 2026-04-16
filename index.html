@@ -1,63 +1,377 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>远视鹿</title>
+    <!-- 引入中国色页面同款字体 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
     <style>
-        body {
+        /* ========== 宣纸 · 中国色风格变量 ========== */
+        :root {
+            --paper:    #f5f0e8;
+            --paper-2:  #ede8da;
+            --ink:      #2a2318;
+            --ink-2:    #4a3f2f;
+            --ink-3:    #7a6e5a;
+            --ink-4:    #b0a490;
+            --line:     #d4cab8;
+            --line-2:   #e5dece;
+            --accent:   #8b2020;
+            --gold:     #9a7e3e;
+            --serif:    'Noto Serif SC', 'Source Han Serif CN', 'STSong', Georgia, serif;
+            --xiaowei:  'ZCOOL XiaoWei', 'STSong', serif;
+            --mono:     'SF Mono', 'Fira Code', 'Courier New', monospace;
+        }
+
+        * {
             margin: 0;
-            height: 100vh;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--paper);
+            font-family: var(--serif);
+            color: var(--ink);
+            min-height: 100vh;
+            /* 宣纸纹理 + 微妙噪点 (来自国色吸管页) */
+            background-image:
+                radial-gradient(ellipse at 20% 30%, rgba(210,195,160,0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 70%, rgba(180,165,130,0.10) 0%, transparent 60%),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            font-family: Arial, sans-serif;
-            overflow: hidden;
+            padding: 2rem;
         }
-        .container {
-            text-align: center;
-            position: relative;
+
+        /* 主容器：优雅居中，带有传统书卷气息 */
+        .home-container {
+            max-width: 900px;
+            width: 100%;
+            background: rgba(245,240,232,0.5);
+            backdrop-filter: blur(2px);
+            border-radius: 2px;
+            padding: 2rem 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,240,0.6);
+            border: 1px solid var(--line);
+            transition: all 0.2s;
+        }
+
+        /* 主要文字区域 (保留原竖排意境，但融入横排辅助，更显文人雅致) */
+        .verse-area {
             display: flex;
-            align-items: flex-end;
-        }
-        .main-text {
-            font-size: 24px;
-            writing-mode: vertical-rl;
-            text-orientation: upright;
-            margin-right: 20px;
-        }
-        .signature {
-            font-size: 18px;
-            writing-mode: vertical-rl;
-            text-orientation: upright;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: baseline;
+            gap: 1.8rem;
+            margin-bottom: 3rem;
+            padding-bottom: 1.2rem;
+            border-bottom: 1px dashed var(--line-2);
             position: relative;
+        }
+        /* 竖排文字块 */
+        .vertical-text {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            font-family: var(--xiaowei);
+            font-weight: 400;
+            letter-spacing: 0.08em;
+            line-height: 1.6;
+        }
+        .main-line {
+            font-size: 2.2rem;
+            color: var(--ink);
+            text-shadow: 1px 1px 0 rgba(180,165,130,0.2);
+        }
+        .signature-line {
+            font-size: 1.9rem;
+            color: var(--ink-2);
+            display: inline-flex;
+            align-items: baseline;
+            gap: 0.1rem;
         }
         #deer {
-            transition: all 0.5s ease;
+            display: inline-block;
+            min-width: 1.8rem;
+            text-align: center;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            color: var(--accent);
+            font-family: var(--xiaowei);
+        }
+        /* 为表情符号调整大小 */
+        #deer.emoji-mode {
+            font-size: 1.8rem;
+            filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1));
+        }
+        /* 点缀印章 */
+        .chop-seal {
+            position: absolute;
+            bottom: -0.8rem;
+            right: 0.5rem;
+            font-size: 0.6rem;
+            color: var(--accent);
+            font-family: var(--xiaowei);
+            border: 1px solid var(--accent);
+            padding: 0.1rem 0.4rem;
+            border-radius: 1px;
+            opacity: 0.6;
+            letter-spacing: 0.1em;
+            transform: rotate(-5deg);
+            background: rgba(139,32,32,0.05);
+        }
+
+        /* 三个博客链接区 (优雅卡片风格) */
+        .blog-links {
+            margin-top: 1.8rem;
+            text-align: center;
+        }
+        .blog-links h3 {
+            font-family: var(--xiaowei);
+            font-weight: 300;
+            font-size: 0.8rem;
+            letter-spacing: 0.3em;
+            color: var(--ink-3);
+            margin-bottom: 1.2rem;
+            position: relative;
+            display: inline-block;
+            padding: 0 0.5rem;
+        }
+        .blog-links h3:before,
+        .blog-links h3:after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 24px;
+            height: 1px;
+            background: var(--line);
+        }
+        .blog-links h3:before { left: -28px; }
+        .blog-links h3:after { right: -28px; }
+        .link-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 0.8rem;
+        }
+        .blog-card {
+            background: rgba(255,250,240,0.5);
+            backdrop-filter: blur(2px);
+            border: 1px solid var(--line);
+            padding: 0.7rem 1.6rem;
+            min-width: 130px;
+            transition: all 0.25s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--ink-2);
+            font-family: var(--serif);
+            font-size: 0.9rem;
+            letter-spacing: 0.12em;
+            border-radius: 2px;
+            position: relative;
+            overflow: hidden;
+        }
+        .blog-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(154,126,62,0.08), transparent);
+            transition: left 0.4s;
+        }
+        .blog-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--gold);
+            box-shadow: 0 6px 14px rgba(42,35,24,0.08);
+            color: var(--accent);
+        }
+        .blog-card:hover::before {
+            left: 100%;
+        }
+        /* 小装饰 – 毛笔点 */
+        .blog-card:after {
+            content: '⚬';
+            font-size: 0.5rem;
+            position: absolute;
+            bottom: 4px;
+            right: 8px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            color: var(--gold);
+        }
+        .blog-card:hover:after {
+            opacity: 0.6;
+        }
+
+        /* 页脚 */
+        .footer-note {
+            text-align: center;
+            margin-top: 2.5rem;
+            font-size: 0.6rem;
+            color: var(--ink-4);
+            letter-spacing: 0.2em;
+            font-family: var(--serif);
+            border-top: 1px solid var(--line-2);
+            padding-top: 1.5rem;
+            width: 100%;
+        }
+        .footer-note span {
+            display: inline-block;
+            margin: 0 0.5rem;
+        }
+
+        /* 响应式微调 */
+        @media (max-width: 640px) {
+            body { padding: 1rem; }
+            .home-container { padding: 1.2rem; }
+            .verse-area { gap: 1rem; margin-bottom: 2rem; }
+            .main-line { font-size: 1.6rem; }
+            .signature-line { font-size: 1.4rem; }
+            #deer.emoji-mode { font-size: 1.5rem; }
+            .blog-card { padding: 0.5rem 1.2rem; font-size: 0.8rem; min-width: 100px; }
+            .link-group { gap: 0.8rem; }
+            .chop-seal { font-size: 0.5rem; bottom: -0.5rem; }
+        }
+        @media (max-width: 480px) {
+            .main-line { font-size: 1.3rem; }
+            .signature-line { font-size: 1.2rem; }
+            .blog-card { padding: 0.4rem 1rem; font-size: 0.7rem; }
+        }
+
+        /* 添加优雅的鼠标悬停交互 */
+        .vertical-text:hover {
+            text-shadow: 0 0 2px rgba(154,126,62,0.3);
+        }
+        /* 让鹿的切换更生动 */
+        #deer {
+            transition: transform 0.2s;
+        }
+        #deer:hover {
+            transform: scale(1.05);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="main-text">叶子的高高</div>
-        <div class="signature">远视<span id="deer">鹿</span></div>
+<div class="home-container">
+    <div class="verse-area">
+        <!-- 保留原创意：叶子的高高 + 远视鹿 竖排形式，但更符合文人气质 -->
+        <div class="vertical-text main-line">叶子的高高</div>
+        <div class="vertical-text signature-line">
+            远视<span id="deer">鹿</span>
+        </div>
+        <div class="chop-seal">空间、符号、色彩</div>
     </div>
 
-    <script>
-        const deer = document.getElementById('deer');
-        let isText = true;
+    <!-- 三个博客子链接区块 (中间位置) -->
+    <div class="blog-links">
+        <h3></h3>
+        <div class="link-group">
+            <a href="./gsxg/index.html" class="blog-card" data-blog="2">✂️ 国色吸管</a><br>
+        </div>
+        <div class="link-group">
+            <a href="./jl3xs/index.html" class="blog-card" data-blog="1">📖 关于交流我的三件小事</a>
+            <!--a href="#" class="blog-card" data-blog="3">🏔️ 观山语</a-->
+        </div>
+
+        <div style="font-size: 0.6rem; color: var(--ink-4); margin-top: 0.8rem; letter-spacing: 0.1rem;">
+            ·   ·
+        </div>
+    </div>
+
+    <div class="footer-note">
+        <span>◈</span> <a href="https://yuanshilu.top">yuanshilu.top</a> <span>◈</span>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // 保留原页面趣味：鹿字 与 🦌 随机切换
+        const deerSpan = document.getElementById('deer');
+        let isText = true;      // true: 汉字"鹿", false: 表情🦌
+
+        // 辅助：根据内容调整样式，让表情与汉字视觉协调
+        function updateDeerStyle() {
+            if (!isText) {
+                // 表情模式
+                deerSpan.textContent = '🦌';
+                deerSpan.classList.add('emoji-mode');
+                deerSpan.style.fontFamily = 'apple color emoji, "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
+                deerSpan.style.fontWeight = 'normal';
+            } else {
+                deerSpan.textContent = '鹿';
+                deerSpan.classList.remove('emoji-mode');
+                deerSpan.style.fontFamily = 'var(--xiaowei)';
+                deerSpan.style.fontWeight = '400';
+            }
+        }
 
         function toggleDeer() {
             if (isText) {
-                deer.textContent = '🦌';
+                isText = false;
             } else {
-                deer.textContent = '鹿';
+                isText = true;
             }
-            isText = !isText;
-            setTimeout(toggleDeer, Math.random() * 3000 + 2000); // 随机 2-5 秒之间切换
+            updateDeerStyle();
+            // 随机延时 1.8~4.5 秒，更显自然
+            const nextDelay = Math.random() * 2700 + 1800;
+            setTimeout(toggleDeer, nextDelay);
         }
 
-        toggleDeer();
-    </script>
+        // 初始化
+        updateDeerStyle();
+        // 启动交替 (避免递归堆栈过多但setTimeout合理)
+        setTimeout(toggleDeer, Math.random() * 2000 + 1500);
+
+        // 可选：点击鹿时手动切换一次，增加趣味
+        deerSpan.addEventListener('click', (e) => {
+            e.stopPropagation();
+            // 手动翻转状态
+            isText = !isText;
+            updateDeerStyle();
+        });
+
+        const blogCards = document.querySelectorAll('.blog-card');
+        /* TM的，AI写的花里胡哨交互，注释掉
+        blogCards.forEach(card => {
+            card.addEventListener('click', (e) => {
+                e.preventDefault();
+                const blogName = card.textContent.trim();
+                // 模拟轻提示，不失古意
+                const toast = document.createElement('div');
+                toast.textContent = `📜 即将步入「${blogName}」 · 待君挥毫`;
+                toast.style.position = 'fixed';
+                toast.style.bottom = '20px';
+                toast.style.left = '50%';
+                toast.style.transform = 'translateX(-50%)';
+                toast.style.backgroundColor = 'var(--ink)';
+                toast.style.color = 'var(--paper)';
+                toast.style.padding = '6px 18px';
+                toast.style.fontSize = '0.7rem';
+                toast.style.fontFamily = 'var(--serif)';
+                toast.style.letterSpacing = '0.1em';
+                toast.style.borderRadius = '2px';
+                toast.style.zIndex = '999';
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.2s';
+                document.body.appendChild(toast);
+                setTimeout(() => { toast.style.opacity = '1'; }, 10);
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    setTimeout(() => toast.remove(), 300);
+                }, 1600);
+                // 未来可替换为真实路径，目前仅为优雅占位
+                window.location.href = `/blog/${card.getAttribute('data-blog')}`;
+            });
+        });
+        */
+    })();
+</script>
 </body>
 </html>

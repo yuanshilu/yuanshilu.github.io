@@ -1,0 +1,178 @@
+/* style.css - 中国色 · 宣纸风格全局样式 */
+:root {
+    --paper:    #f5f0e8;
+    --paper-2:  #ede8da;
+    --ink:      #2a2318;
+    --ink-2:    #4a3f2f;
+    --ink-3:    #7a6e5a;
+    --ink-4:    #b0a490;
+    --line:     #d4cab8;
+    --line-2:   #e5dece;
+    --accent:   #8b2020;
+    --gold:     #9a7e3e;
+    --serif:    'Noto Serif SC', 'Source Han Serif CN', 'STSong', Georgia, serif;
+    --xiaowei:  'ZCOOL XiaoWei', 'STSong', serif;
+    --mono:     'SF Mono', 'Fira Code', 'Courier New', monospace;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: var(--paper);
+    font-family: var(--serif);
+    color: var(--ink);
+    min-height: 100vh;
+    background-image:
+        radial-gradient(ellipse at 20% 30%, rgba(210,195,160,0.15) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 70%, rgba(180,165,130,0.10) 0%, transparent 60%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+    line-height: 1.6;
+}
+
+/* 主容器 - 文章页可复用 */
+.container {
+    max-width: 860px;
+    margin: 2rem auto;
+    padding: 2rem 2rem 3rem;
+    background: rgba(245,240,232,0.6);
+    backdrop-filter: blur(2px);
+    border: 1px solid var(--line);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+}
+
+/* 文章头部 */
+.article-header {
+    text-align: center;
+    border-bottom: 1px dashed var(--line-2);
+    margin-bottom: 2rem;
+    padding-bottom: 1.2rem;
+}
+.article-title {
+    font-family: var(--xiaowei);
+    font-size: 2rem;
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    color: var(--ink);
+    margin-bottom: 0.75rem;
+}
+.article-meta {
+    font-size: 0.7rem;
+    color: var(--ink-4);
+    letter-spacing: 0.1em;
+    display: flex;
+    justify-content: center;
+    gap: 1.2rem;
+}
+.article-meta span {
+    display: inline-block;
+}
+
+/* 正文区域 */
+.article-content {
+    font-size: 1rem;
+    color: var(--ink-2);
+}
+.article-content p {
+    margin: 1.2em 0;
+    /*text-indent: 2em;*/
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    font-weight: 400;
+    color: #1e1e2a;
+}
+.article-content h2 {
+    font-family: var(--xiaowei);
+    font-size: 1.4rem;
+    font-weight: 400;
+    margin: 1.6em 0 0.6em;
+    letter-spacing: 0.1em;
+    color: var(--ink);
+    border-left: 4px solid var(--gold);
+    padding-left: 0.8rem;
+}
+.article-content h3 {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin: 1.2em 0 0.4em;
+    color: var(--ink-2);
+}
+.article-content blockquote {
+    margin: 1em 2em;
+    padding: 0.6em 1.2em;
+    border-left: 3px solid var(--gold);
+    background: rgba(154,126,62,0.08);
+    font-style: italic;
+    color: var(--ink-3);
+}
+.article-content ul, .article-content ol {
+    margin: 0.8em 0 0.8em 2.5em;
+}
+.article-content li {
+    margin: 0.3em 0;
+}
+.article-content a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--accent);
+}
+.article-content a:hover {
+    border-bottom: 1px solid var(--accent);
+}
+.article-content img {
+    max-width: 100%;
+    height: auto;
+    margin: 1.5rem 0;
+    border: 1px solid var(--line);
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.05);
+}
+.article-content hr {
+    margin: 2rem 0;
+    border: none;
+    height: 1px;
+    background: linear-gradient(to right, var(--line-2), transparent);
+}
+
+/* 返回首页链接 */
+.back-home {
+    margin-top: 3rem;
+    text-align: center;
+}
+.back-home a {
+    font-family: var(--serif);
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    color: var(--ink-4);
+    text-decoration: none;
+    border: 1px solid var(--line);
+    padding: 0.3rem 1.2rem;
+    transition: all 0.2s;
+}
+.back-home a:hover {
+    border-color: var(--gold);
+    color: var(--accent);
+    background: var(--paper-2);
+}
+
+/* 页脚 */
+.footer-note {
+    text-align: center;
+    margin-top: 2.5rem;
+    font-size: 0.6rem;
+    color: var(--ink-4);
+    letter-spacing: 0.2em;
+    border-top: 1px solid var(--line-2);
+    padding-top: 1.5rem;
+}
+
+/* 响应式 */
+@media (max-width: 700px) {
+    .container { margin: 1rem; padding: 1.2rem; }
+    .article-title { font-size: 1.6rem; }
+    .article-content { font-size: 0.9rem; }
+    .article-content blockquote { margin: 0.8em 1em; }
+}
