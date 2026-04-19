@@ -4,9 +4,43 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>打印歌</title>
+<!--
 <style>
   body { margin: 0; background: #e8e0d0; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; padding: 2rem; box-sizing: border-box; }
   svg  { max-width: 680px; width: 100%; display: block; }
+</style>
+-->
+<style>
+body { 
+  margin: 0; 
+  background: #e8e0d0; 
+  /* 改为垂直排列，内容居中 */
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  /* 移除或减小 padding-top 解决顶部留白 */
+  padding: 1rem 2rem 3rem 2rem; 
+  box-sizing: border-box; 
+  min-height: 100vh; 
+}
+
+svg { 
+  max-width: 680px; 
+  width: 100%; 
+  height: auto; /* 确保高度随宽度自适应，防止占位错误 */
+  display: block; 
+}
+
+/* 为链接添加一个简单的样式，方便点击 */
+.download-link {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background: #8b6f47;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  font-family: serif;
+}
 </style>
 </head>
 <body>
@@ -187,6 +221,9 @@
   </text>
 
 </svg>
+
+<br>
+<a href="./dayinge.pdf" class="download-link">PDF 版本</a>
 
 <script>
 function saveSvgAsPng() {
