@@ -3,243 +3,175 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>打印歌</title>
-<!--
+<title>打印歌 - 尺寸记忆海报</title>
 <style>
-  body { margin: 0; background: #e8e0d0; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; padding: 2rem; box-sizing: border-box; }
-  svg  { max-width: 680px; width: 100%; display: block; }
-</style>
--->
-<style>
-body { 
-  margin: 0; 
-  background: #e8e0d0; 
-  /* 改为垂直排列，内容居中 */
-  display: flex; 
-  flex-direction: column; 
-  align-items: center; 
-  /* 移除或减小 padding-top 解决顶部留白 */
-  padding: 1rem 2rem 3rem 2rem; 
-  box-sizing: border-box; 
-  min-height: 100vh; 
-}
+  body { 
+    margin: 0; 
+    background: #dcd3c1; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    padding: 1rem; 
+    box-sizing: border-box; 
+    min-height: 100vh;
+    font-family: "Noto Serif SC", "Source Han Serif SC", "Source Han Serif CN", "Songti SC", serif;
+  }
 
-svg { 
-  max-width: 680px; 
-  width: 100%; 
-  height: auto; /* 确保高度随宽度自适应，防止占位错误 */
-  display: block; 
-}
+  /* 容器阴影，增加纸张立面感 */
+  .svg-container {
+    box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+    background: #fcfaf2;
+    line-height: 0;
+  }
 
-/* 为链接添加一个简单的样式，方便点击 */
-.download-link {
-  margin-top: 20px;
-  padding: 10px 20px;
-  background: #8b6f47;
-  color: white;
-  text-decoration: none;
-  border-radius: 4px;
-  font-family: serif;
-}
+  svg { 
+    max-width: 100%; 
+    height: auto; 
+    display: block; 
+  }
+
+  .controls {
+    margin-top: 25px;
+    display: flex;
+    gap: 15px;
+  }
+
+  .btn {
+    padding: 12px 24px;
+    background: #62102e; /* 借用葡萄酒红 */
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.2s;
+  }
+  .btn:hover { opacity: 0.9; }
+  .btn-secondary { background: #8b6f47; }
 </style>
 </head>
 <body>
-<!--
-  打印歌 SVG 海报
-  viewBox: 680 × 962  （竖向 A4 比例，210:297）
-  配色取自国色吸管 https://yuanshilu.top/gsxg
--->
+
+<div class="svg-container">
 <svg id="main-svg" width="680" height="962" viewBox="0 0 680 962" xmlns="http://www.w3.org/2000/svg">
-  <title>打印歌——A4/A5/A6尺寸记忆口诀</title>
-  <desc>宣纸印章风格的打印纸尺寸记忆口诀海报，配色取自国色中国传统色谱</desc>
+  <defs>
+    <filter id="paper-texture" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="5" result="noise" />
+      <feDiffuseLighting in="noise" lighting-color="#fcfaf2" surfaceScale="2">
+        <feDistantLight azimuth="45" elevation="60" />
+      </feDiffuseLighting>
+    </filter>
+  </defs>
 
-  <style>
-    .poem-bg   { fill: #f5f0e8; }
-    .b-out     { fill: none; stroke: #8b6f47; stroke-width: 2.5; }
-    .b-in      { fill: none; stroke: #8b6f47; stroke-width: 0.8; }
-    .title-txt { font-family: serif; font-size: 28px; font-weight: 500; fill: #2c1a0e; text-anchor: middle; }
-    .poem-line { font-family: serif; font-size: 26px; font-weight: 400; fill: #2c1a0e; text-anchor: middle; letter-spacing: 3px; }
-    .sub-txt   { font-family: serif; font-size: 14px; fill: #7a5c3a; text-anchor: middle; }
-    .note-txt  { font-family: serif; font-size: 11px; fill: #5a4535; }
-    .divider   { stroke: #8b6f47; stroke-width: 0.8; }
-    .dot-bg    { fill: #c8a97a; opacity: 0.18; }
+  <rect width="680" height="962" fill="#fcfaf2" />
+  <rect width="680" height="962" fill="url(#paper-texture)" opacity="0.4" />
 
-    <!--.col-a5l   { fill: #4d8c57; }-->
-    .col-a5l   { fill: #3170a7; } <!--安安蓝-->
-    <!--.col-a5f   { fill: #c03c30; }-->
-    .col-a5f   { fill: #f34718; } <!--榴花红-->
-    <!--.col-a4    { fill: #1a5276; }-->
-    .col-a4    { fill: #62102e; } <!--葡萄酒红-->
-    <!--.col-a6    { fill: #6a4c93; }-->
-    .col-a6    { fill: #57c3c2 } <!--石绿-->
+  <rect x="25" y="25" width="630" height="912" rx="2" fill="none" stroke="#8b6f47" stroke-width="3" />
+  <rect x="35" y="35" width="610" height="892" rx="1" fill="none" stroke="#8b6f47" stroke-width="0.5" opacity="0.6" />
 
-    <!--
-    .box-a5    { fill: #eaf5ec; stroke: #4d8c57; stroke-width: 1.2; }
-    .box-a4    { fill: #e8f0f7; stroke: #1a5276; stroke-width: 1.2; }
-    .box-a6    { fill: #f0ecf7; stroke: #6a4c93; stroke-width: 1.2; }-->
-    .box-a5    { fill: #e4dfd7; stroke: #000000; stroke-width: 1.2; }
-    .box-a4    { fill: #e4dfd7; stroke: #000000; stroke-width: 1.2; }
-    .box-a6    { fill: #e4dfd7; stroke: #000000; stroke-width: 1.2; }
-
-    .box-ghost { fill: none; stroke: #6a4c93; stroke-width: 1; stroke-dasharray: 4,3; }
-    <!--.lbl-a5    { font-family: serif; font-size: 13px; fill: #4d8c57; text-anchor: middle; }
-    .lbl-a4    { font-family: serif; font-size: 13px; fill: #1a5276; text-anchor: middle; }
-    .lbl-a6    { font-family: serif; font-size: 13px; fill: #6a4c93; text-anchor: middle; }-->
-    .lbl-a5    { font-family: serif; font-size: 13px; fill: #000000; text-anchor: middle; }
-    .lbl-a4    { font-family: serif; font-size: 13px; fill: #000000; text-anchor: middle; }
-    .lbl-a6    { font-family: serif; font-size: 13px; fill: #000000; text-anchor: middle; }
-
-    .dim-txt   { font-family: serif; font-size: 11px; }
-
-    .seal-b    { fill: none; stroke: #c03c30; stroke-width: 1.5; }
-    .seal-txt  { font-family: serif; font-size: 11px; fill: #c03c30; text-anchor: middle; }
-    .seal-save-b   { fill: none; stroke: #1a5276; stroke-width: 1.5; }
-    .seal-save-txt { font-family: serif; font-size: 11px; fill: #1a5276; text-anchor: middle; }
-
-    .credit-txt { font-family: serif; font-size: 10px; fill: #8b6f47; }
-    .credit-lnk { font-family: serif; font-size: 10px; fill: #8b6f47; text-decoration: underline; cursor: pointer; }
-  </style>
-
-  <!-- 背景 & 边框 -->
-  <rect width="680" height="962" class="poem-bg"/>
-  <circle cx="60"  cy="76"  r="32" class="dot-bg"/>
-  <circle cx="620" cy="76"  r="32" class="dot-bg"/>
-  <circle cx="60"  cy="886" r="32" class="dot-bg"/>
-  <circle cx="620" cy="886" r="32" class="dot-bg"/>
-  <rect x="28" y="35" width="624" height="892" rx="2" class="b-out"/>
-  <rect x="38" y="48" width="604" height="866" rx="1" class="b-in"/>
-
-  <!-- 标题 -->
-  <text x="340" y="114" class="title-txt">《 打 印 歌 》</text>
-  <line x1="100" y1="134" x2="580" y2="134" class="divider"/>
-  <line x1="110" y1="142" x2="570" y2="142" class="divider" stroke-dasharray="3,4"/>
-
-  <!-- A5 句 -->
-  <text y="202" class="poem-line">
-    <tspan x="340" text-anchor="middle">
-      <tspan fill="#2c1a0e">5</tspan><tspan class="col-a5l">爱你了</tspan><tspan class="col-a5f">你是花</tspan>
-    </tspan>
-  </text>
-  <text x="340" y="233" class="sub-txt">
-    <tspan fill="#7a5c3a"></tspan><tspan class="col-a5l">21.0</tspan><tspan fill="#7a5c3a"> cm·</tspan><tspan class="col-a5f">14.8</tspan><tspan fill="#7a5c3a"> cm</tspan>
-  </text>
-
-  <!-- A4 句 -->
-  <text y="296" class="poem-line">
-    <tspan x="340" text-anchor="middle">
-      <tspan fill="#2c1a0e">A4肚肚</tspan><tspan class="col-a4">爱酒恰</tspan>
-    </tspan>
-  </text>
-  <text x="340" y="326" class="sub-txt">
-    <tspan fill="#7a5c3a"></tspan>
-    <tspan class="col-a5l">21.0</tspan>
-    <tspan fill="#7a5c3a"> cm·</tspan><tspan class="col-a4">29.7</tspan><tspan fill="#7a5c3a"> cm</tspan>
-  </text>
-
-  <!-- A6 句 -->
-  <text y="392" class="poem-line">
-    <tspan x="340" text-anchor="middle">
-      <tspan fill="#2c1a0e">A6挂个</tspan><tspan class="col-a6">矮冬瓜</tspan><tspan fill="#2c1a0e"></tspan>
-    </tspan>
-  </text>
-  <text x="340" y="423" class="sub-txt">
-    <tspan fill="#7a5c3a"></tspan><tspan class="col-a6">10.5</tspan><tspan fill="#7a5c3a"> cm·</tspan>
-    <tspan class="col-a5f">14.8</tspan>
-    <tspan fill="#7a5c3a"> cm</tspan>
-  </text>
-
-  <!-- 分割线 -->
-  <line x1="110" y1="453" x2="570" y2="453" class="divider" stroke-dasharray="3,4"/>
-  <line x1="100" y1="461" x2="580" y2="461" class="divider"/>
-
-  <!-- A4 框 -->
-  <rect x="144" y="562" width="175" height="124" class="box-a4"/>
-  <line x1="232" y1="562" x2="232" y2="686" stroke="#1a5276" stroke-width="1" stroke-dasharray="5,3"/>
-  <text x="232" y="632" class="lbl-a4">A4</text>
-  <text x="232" y="704" class="dim-txt col-a4" text-anchor="middle" >297</text>
-  <text x="232" y="730" class="note-txt" text-anchor="middle">胖一倍</text>
-  <text x="232" y="756" class="note-txt" text-anchor="middle">'4' 字：啤酒肚</text>
-
-  <!-- A5 框 -->
-  <rect x="340" y="562" width="88" height="124" class="box-a5"/>
-  <text x="384" y="632" class="lbl-a5">A5</text>
-  <text x="384" y="704" text-anchor="middle" class="dim-txt col-a5f">148</text>
-  <text x="384" y="730" font-family="serif" font-size="11" fill="#5a4535" text-anchor="middle">基准</text>
-  <text x="384" y="756" font-family="serif" font-size="11" fill="#5a4535" text-anchor="middle">高递减｜宽递增</text>
-  <text x="330" y="615" class="dim-txt col-a5l" text-anchor="end" >2</text>
-  <text x="330" y="628" class="dim-txt col-a5l" text-anchor="end" >1</text>
-  <text x="330" y="641" class="dim-txt col-a5l" text-anchor="end" >0</text>
-  <!--text x="326" y="641" class="dim-txt" text-anchor="end">递</text>
-  <text x="326" y="654" class="dim-txt" text-anchor="end">减</text-->
-
-  <!-- A6 ghost：x=448 y=562 w=88 h=78 -->
-  <rect x="448" y="562" width="88" height="62" class="box-ghost"/>
-  <!-- A6 实线：x=448 y=607 w=88 h=79 底=686 -->
-  <rect x="448" y="624" width="88" height="62" class="box-a6"/>
-  <text x="492" y="659" class="lbl-a6">A6</text>
-  <text x="454" y="646" class="dim-txt col-a6" text-anchor="middle" >1</text>
-  <text x="454" y="659" class="dim-txt col-a6" text-anchor="middle" >0</text>
-  <text x="454" y="672" class="dim-txt col-a6" text-anchor="middle" >5</text>
-  <text x="492" y="704" class="dim-txt col-a5f" text-anchor="middle">148</text>
-  <text x="492" y="730" class="note-txt" text-anchor="middle">矮一半</text>
-  <text x="492" y="756" class="note-txt" text-anchor="middle">'6' 字：矮冬瓜</text>
-
-  <!-- ══════════════════════════════════════════
-       右下角（右对齐 x=628）：
-         印章 远视鹿  top=769 h=36 底=805  → 链接 yuanshilu.top
-         日期         y=835
-         配色备注     y=855
-
-       左下角：
-         印章 留存备览  水平与远视鹿对齐 top=769 h=36
-                       左边与A4框左边对齐 x=144
-                       点击保存SVG为PNG
-  ══════════════════════════════════════════ -->
-
-  <!-- 远视鹿印章（右下） -->
-  <a href="https://yuanshilu.top" target="_blank" style="cursor:pointer;">
-    <rect x="556" y="869" width="72" height="36" rx="2" class="seal-b"/>
-    <rect x="559" y="872" width="66" height="30" rx="1" class="seal-b" stroke-dasharray="2,2"/>
-    <text x="592" y="892" class="seal-txt">远视鹿</text>
-  </a>
-
-  <!-- 日期 -->
-  <text x="592" y="860" font-family="serif" font-size="12" fill="#a08060" text-anchor="middle">2026.04.19</text>
-
-  <!-- 留存备览印章（左下，与远视鹿水平对齐，左边 x=144） -->
-  <g id="save-stamp" style="cursor:pointer;" onclick="saveSvgAsPng()">
-    <rect x="144" y="869" width="72" height="36" rx="2" class="seal-save-b"/>
-    <rect x="147" y="872" width="66" height="30" rx="1" class="seal-save-b" stroke-dasharray="2,2"/>
-    <text x="180" y="892" class="seal-save-txt">留存备览</text>
+  <g transform="translate(340, 100)">
+    <text y="0" font-family="serif" font-size="42" font-weight="700" fill="#2c1a0e" text-anchor="middle" letter-spacing="8">打 印 歌</text>
+    <text y="40" font-family="serif" font-size="14" fill="#8b6f47" text-anchor="middle" letter-spacing="2" opacity="0.8">常用打印纸张尺寸记忆口诀(单位:毫米)</text>
+    <path d="M -150 60 L 150 60" stroke="#8b6f47" stroke-width="1" />
+    <circle cx="0" cy="60" r="3" fill="#8b6f47" />
   </g>
 
-  <!-- 配色备注 -->
-  <text x="180" y="835" class="credit-txt" text-anchor="middle"><tspan class="col-a5l">安安蓝</tspan><tspan class="col-a5f">榴花红</tspan></text>
-  <text x="180" y="848" class="credit-txt" text-anchor="middle"><tspan class="col-a4">葡萄酒红</tspan><tspan class="col-a6">石绿</tspan></text>
-  <text x="180" y="860" text-anchor="middle">
-    <tspan class="credit-txt">配色 </tspan><tspan class="credit-lnk" onclick="window.open('https://yuanshilu.top/gsxg','_blank')">国色滴管</tspan>
-  </text>
+  <g transform="translate(340, 240)">
+    <g>
+      <text font-family="serif" font-size="34" font-weight="500" fill="#1a1a1a" text-anchor="middle">
+        <tspan>5</tspan><tspan fill="#3170a7">爱你了</tspan><tspan fill="#f34718">你是花</tspan>
+      </text>
+      <text y="38" font-family="serif" font-size="18" font-weight="bold" text-anchor="middle">
+        <tspan fill="#3170a7">210</tspan><tspan fill="#8b6f47" font-weight="normal"> × </tspan><tspan fill="#f34718">148</tspan><tspan fill="#8b6f47" font-size="12" font-weight="normal"></tspan>
+      </text>
+    </g>
 
+    <g transform="translate(0, 110)">
+      <text font-family="serif" font-size="34" font-weight="500" fill="#1a1a1a" text-anchor="middle">
+        <tspan>A4肚肚</tspan><tspan fill="#62102e">爱酒恰</tspan>
+      </text>
+      <text y="38" font-family="serif" font-size="18" font-weight="bold" text-anchor="middle">
+        <tspan fill="#3170a7">210</tspan><tspan fill="#8b6f47" font-weight="normal"> × </tspan><tspan fill="#62102e">297</tspan><tspan fill="#8b6f47" font-size="12" font-weight="normal"></tspan>
+      </text>
+    </g>
+
+    <g transform="translate(0, 220)">
+      <text font-family="serif" font-size="34" font-weight="500" fill="#1a1a1a" text-anchor="middle">
+        <tspan>A6挂个</tspan><tspan fill="#57c3c2">矮冬瓜</tspan>
+      </text>
+      <text y="38" font-family="serif" font-size="18" font-weight="bold" text-anchor="middle">
+        <tspan fill="#57c3c2">105</tspan><tspan fill="#8b6f47" font-weight="normal"> × </tspan><tspan fill="#f34718">148</tspan><tspan fill="#8b6f47" font-size="12" font-weight="normal"></tspan>
+      </text>
+    </g>
+  </g>
+
+  <path d="M 200 520 L 480 520" stroke="#8b6f47" stroke-width="0.5" stroke-dasharray="2,4" />
+
+  <g transform="translate(0, 580)">
+    <rect x="130" y="20" width="180" height="126" fill="#e4dfd7" stroke="#2c1a0e" stroke-width="1.5" />
+    <line x1="220" y1="20" x2="220" y2="146" stroke="#62102e" stroke-width="1" stroke-dasharray="4,2" />
+    <text x="220" y="85" font-family="serif" font-size="18" font-weight="bold" fill="#2c1a0e" text-anchor="middle">A4</text>
+    <text x="220" y="170" font-family="serif" font-size="15" font-weight="bold" fill="#62102e" text-anchor="middle">297</text>
+    <text x="220" y="195" font-family="serif" font-size="12" fill="#5a4535" text-anchor="middle">宽度翻倍</text>
+
+    <rect x="340" y="20" width="90" height="126" fill="#e4dfd7" stroke="#2c1a0e" stroke-width="1.5" />
+    <text x="385" y="85" font-family="serif" font-size="18" font-weight="bold" fill="#2c1a0e" text-anchor="middle">A5</text>
+    <text x="385" y="170" font-family="serif" font-size="15" font-weight="bold" fill="#f34718" text-anchor="middle">148</text>
+    <text x="385" y="195" font-family="serif" font-size="12" fill="#5a4535" text-anchor="middle">基准高度</text>
+    <text x="325" y="85" font-family="serif" font-size="14" font-weight="bold" fill="#3170a7" text-anchor="middle">210</text>
+
+    <rect x="460" y="83" width="90" height="63" fill="#e4dfd7" stroke="#2c1a0e" stroke-width="1.5" />
+    <rect x="460" y="20" width="90" height="63" fill="none" stroke="#8b6f47" stroke-width="1" stroke-dasharray="3,3" opacity="0.5" />
+    <text x="505" y="120" font-family="serif" font-size="16" font-weight="bold" fill="#2c1a0e" text-anchor="middle">A6</text>
+    <text x="505" y="170" font-family="serif" font-size="15" font-weight="bold" fill="#f34718" text-anchor="middle">148</text>
+    <text x="552" y="120" font-family="serif" font-size="14" font-weight="bold" fill="#57c3c2" text-anchor="left">105</text>
+    <text x="505" y="195" font-family="serif" font-size="12" fill="#5a4535" text-anchor="middle">高度减半</text>
+  </g>
+
+  <g transform="translate(0, 850)">
+    <g transform="translate(340, 30)">
+        <text font-family="serif" font-size="11" fill="#8b6f47" text-anchor="middle">
+            <tspan fill="#3170a7">安安蓝</tspan> | <tspan fill="#f34718">榴花红</tspan> | <tspan fill="#62102e">葡萄酒红</tspan> | <tspan fill="#57c3c2">石绿</tspan>
+        </text>
+        <text y="20" font-family="serif" font-size="10" fill="#8b6f47" text-anchor="middle" opacity="0.8" onclick="window.open('https://yuanshilu.top/gsxg','_blank')">配色方案：国色滴管</text>
+    </g>
+
+    <a href="https://yuanshilu.top" target="_blank" style="text-decoration:none;">
+      <g transform="translate(470, 20)">
+        <rect width="80" height="40" rx="2" fill="none" stroke="#f34718" stroke-width="2" />
+        <text x="40" y="30" font-family="serif" font-size="14" font-weight="bold" fill="#f34718" text-anchor="middle">远视鹿</text>
+        <text x="40" y="15" font-family="serif" font-size="12" fill="#f34718" text-anchor="middle">2026.04.19</text>
+      </g>
+    </a>
+  </g>
 </svg>
+</div>
 
-<br>
-<a href="./dayinge.pdf" class="download-link">PDF 版本</a>
+<div class="controls">
+    <button class="btn" onclick="saveSvgAsPng()">保存图片 (PNG)</button>
+    <a href="./dayinge.pdf" class="btn btn-secondary">下载 PDF 版本</a>
+</div>
 
 <script>
 function saveSvgAsPng() {
   const svg = document.getElementById('main-svg');
   const serializer = new XMLSerializer();
-  const svgStr = serializer.serializeToString(svg);
-  const svgBlob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
-  const url = URL.createObjectURL(svgBlob);
+  let svgStr = serializer.serializeToString(svg);
+  
+  // 确保导出时包含字体信息
+  const blob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
 
   const img = new Image();
   img.onload = function () {
-    const scale = 2; // 2x 清晰度
+    const scale = 3; // 提升到 3 倍清晰度，适合打印
     const canvas = document.createElement('canvas');
-    canvas.width  = svg.width.baseVal.value * scale;
-    canvas.height = svg.height.baseVal.value * scale;
+    canvas.width  = svg.getAttribute('width') * scale;
+    canvas.height = svg.getAttribute('height') * scale;
     const ctx = canvas.getContext('2d');
+    ctx.fillStyle = "#fcfaf2"; // 确保背景不透明
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.scale(scale, scale);
     ctx.drawImage(img, 0, 0);
     URL.revokeObjectURL(url);
@@ -247,7 +179,7 @@ function saveSvgAsPng() {
     canvas.toBlob(function (blob) {
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = '打印歌.png';
+      a.download = '打印歌_尺寸海报.png';
       a.click();
     }, 'image/png');
   };
